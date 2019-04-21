@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import ast
+import astor
+import subprocess
+import sys
+
+
+class Prefixer(ast.NodeTransformer):
+    QUERIES = {
+        # "allpaths": -1,
+        "attr": 2,
+        # "buildfiles": -1,
+        # "rbuildfiles": -1,
+        "deps": 0,
+        "filter": 1,
+        "kind": 1,
+        "labels": 1,
+        # "loadfiles": -1,
+        "rdeps": 1,
+        # "allrdeps": -1,
+        "same_pkg_direct_rdeps": 0,
+        "siblings": 0,
+        # "some": -1,
+        # "somepath": -1,
+        "tests": 0,
+        # "visible": -1,
+    }
+
+    def visit_BinOp(self, node: ast.BinOp):
+        # First, recursively transform nested pipe operators.
+        node = self.generic_visit(node)
+
+        pattern_match = all((
+            isinstance(node.op, ast.BitOr),
+            isinstance(node.right, ast.Call),
+        ))
+        if not pattern_match:
+            return node
+
+        query = node.right.func.id
+        if query not in self.QUERIES:
+            return node
+
+        # Move function on the left into the args of the function on the right.
+        prefix = node.right
+        position = self.QUERIES[query]
+        prefix.args.insert(position, node.left)
+
+        return ast.copy_location(prefix, node)
+
+
+def _main():
+    expression = sys.argv[1]
+    rewriter = Prefixer()
+    query = rewriter.visit(ast.parse(expression))
+    command = ["./bazelw", "query", astor.to_source(query)]
+    subprocess.check_call(command)
+
+
+if __name__ == "__main__":
+    _main()
