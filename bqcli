@@ -7,6 +7,16 @@ import sys
 
 
 class Prefixer(ast.NodeTransformer):
+    # These supported query functions indicate which argument position to
+    # insert expressions into.
+    #
+    # For example, given this expression:
+    #     '//...' | filter(':name$')
+    # The result is:
+    #     filter(':name$', '//...')
+    #
+    # The QUERIES dict indicate that the left side should be inserted into
+    # position 1 of the `filter()` function.
     QUERIES = {
         # "allpaths": -1,
         "attr": 2,
