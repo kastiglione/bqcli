@@ -15,9 +15,9 @@ class Prefixer(ast.NodeTransformer):
     # The result is:
     #     filter(':name$', '//...')
     #
-    # The QUERIES dict indicate that the left side should be inserted into
+    # The FUNCTIONS dict indicate that the left side should be inserted into
     # position 1 of the `filter()` function.
-    QUERIES = {
+    FUNCTIONS = {
         # "allpaths": -1,
         "attr": 2,
         # "buildfiles": -1,
@@ -48,16 +48,16 @@ class Prefixer(ast.NodeTransformer):
         if not pattern_match:
             return node
 
-        query = node.right.func.id
-        if query not in self.QUERIES:
+        func = node.right.func.id
+        if func not in self.FUNCTIONS:
             return node
 
         # Move expression on the left into the args of the function on the right.
-        prefix = node.right
-        position = self.QUERIES[query]
-        prefix.args.insert(position, node.left)
+        right = node.right
+        position = self.FUNCTIONS[func]
+        right.args.insert(position, node.left)
 
-        return ast.copy_location(prefix, node)
+        return ast.copy_location(right, node)
 
 
 def _main():
