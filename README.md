@@ -14,7 +14,7 @@ Here's the equivalent query written using a `|` operator:
 rdeps('Modules/...', 'Modules/BusinessTime') | kind(ios_application) | deps() | siblings() | tests()
 ```
 
-### Caveats
+### Limitations
 
 Bazel query expressions are parsed as Python. Bazel query syntax is not a subset of Python, so it's possible to write queries that `bqcli` does not handle.
 
