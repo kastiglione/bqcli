@@ -64,7 +64,7 @@ def _main():
     expression = sys.argv[1]
     rewriter = Prefixer()
     query = rewriter.visit(ast.parse(expression))
-    command = ["./bazelw", "query", astor.to_source(query)]
+    command = ["bazel", "query", astor.to_source(query)]
     subprocess.check_call(command)
 
 
