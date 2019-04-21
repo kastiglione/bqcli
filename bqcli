@@ -42,7 +42,7 @@ class Prefixer(ast.NodeTransformer):
         if query not in self.QUERIES:
             return node
 
-        # Move function on the left into the args of the function on the right.
+        # Move expression on the left into the args of the function on the right.
         prefix = node.right
         position = self.QUERIES[query]
         prefix.args.insert(position, node.left)
