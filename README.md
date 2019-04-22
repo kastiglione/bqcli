@@ -1,6 +1,6 @@
-# Bazel Query CLI Helper
+# Bazel Query CLI Tool
 
-This is a small tool, `bqcli`, which adds conveniences to using [`bazel query`](https://docs.bazel.build/versions/master/query.html) from the command line. The first feature is it adds a pipe `|` operator to allow building up queries left to right.
+This is a small tool, `bq`, which adds conveniences to using [`bazel query`](https://docs.bazel.build/versions/master/query.html) from the command line. The first feature is it adds a pipe `|` operator to allow building up queries left to right.
 
 For example, this query determines all tests belonging to any iOS app that depends on the `Modules/BusinessTime` module.
 
@@ -16,7 +16,7 @@ rdeps('Modules/...', 'Modules/BusinessTime') | kind(ios_application) | deps | si
 
 ### Limitations
 
-Bazel query expressions are parsed as Python. Bazel query syntax is not a subset of Python, so it's possible to write queries that `bqcli` does not handle.
+Bazel query expressions are parsed as Python. Bazel query syntax is not a subset of Python, so it's possible to write queries that `bq` does not handle.
 
 ### Version
 
