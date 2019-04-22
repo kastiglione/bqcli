@@ -11,7 +11,7 @@ tests(siblings(deps(kind(ios_application, rdeps('Modules/...', 'Modules/Business
 Here's the equivalent query written using a `|` operator:
 
 ```python
-rdeps('Modules/...', 'Modules/BusinessTime') | kind(ios_application) | deps() | siblings() | tests()
+rdeps('Modules/...', 'Modules/BusinessTime') | kind(ios_application) | deps | siblings | tests
 ```
 
 ### Limitations

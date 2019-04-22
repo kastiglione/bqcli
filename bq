@@ -41,21 +41,36 @@ class Prefixer(ast.NodeTransformer):
         # First, recursively transform nested pipe operators.
         node = self.generic_visit(node)
 
-        pattern_match = all((
-            isinstance(node.op, ast.BitOr),
-            isinstance(node.right, ast.Call),
-        ))
-        if not pattern_match:
+        # Handle | operations only.
+        if not isinstance(node.op, ast.BitOr):
             return node
 
-        func = node.right.func.id
+        # Handle two kinds of | pipes:
+        #   1. x | f(args)
+        #   2. x | f
+        # The first is an `ast.Call`, the second `ast.Name`.
+        if isinstance(node.right, ast.Call):
+            func = node.right.func.id
+        elif isinstance(node.right, ast.Name):
+            func = node.right.id
+        else:
+            return node
+
+        # Handle only known `bazel query` functions.
         if func not in self.FUNCTIONS:
             return node
 
-        # Move expression on the left into the args of the function on the right.
-        right = node.right
-        position = self.FUNCTIONS[func]
-        right.args.insert(position, node.left)
+        if isinstance(node.right, ast.Call):
+            # Move expression on the left side of the | operation into the args
+            # of the function on the right.
+            right = node.right
+            position = self.FUNCTIONS[func]
+            right.args.insert(position, node.left)
+        elif isinstance(node.right, ast.Name):
+            # The right side is a function, but a reference by `Name`, not a
+            # `Call`. Create an `Call` node where the single argument is the
+            # left side of the | operation (aka node.left).
+            right = ast.Call(node.right, args=[node.left], keywords=[])
 
         return ast.copy_location(right, node)
 
